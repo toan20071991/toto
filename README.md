@@ -68,3 +68,130 @@ python testSample/createCSVtest.py --from-date 2025-07-20 --to-date 2026-07-19 -
 ## Test
 
 python -m unittest discover -s tests -p "test_*.py"
+
+## Run With Docker
+
+Prerequisites (all machines):
+
+- Install Docker (Docker Desktop on Windows/macOS, Docker Engine on Linux).
+- Open a terminal in the project root (folder containing Dockerfile).
+
+Linux/macOS steps:
+
+1) Build image
+
+docker build -t lotto-analyzer:0.1.0 .
+
+2) Run analyzer
+
+docker run --rm \
+  -v "$(pwd)/testSample:/data" \
+  -v "$(pwd)/config:/config" \
+  lotto-analyzer:0.1.0 \
+  --input /data/sample.csv \
+  --config /config/range.json \
+  --bottom-count 10 \
+  --window 1y \
+  --output /data/result.csv
+
+3) Check output
+
+Output file is created at testSample/result.csv on your host machine.
+
+Windows PowerShell steps:
+
+1) Build image
+
+docker build -t lotto-analyzer:0.1.0 .
+
+2) Run analyzer
+
+docker run --rm `
+  -v "${PWD}/testSample:/data" `
+  -v "${PWD}/config:/config" `
+  lotto-analyzer:0.1.0 `
+  --input /data/sample.csv `
+  --config /config/range.json `
+  --bottom-count 10 `
+  --window 1y `
+  --output /data/result.csv
+
+3) Check output
+
+Output file is created at testSample/result.csv on your host machine.
+
+Windows Command Prompt (cmd.exe) steps:
+
+1) Build image
+
+docker build -t lotto-analyzer:0.1.0 .
+
+2) Run analyzer
+
+docker run --rm ^
+  -v "%cd%/testSample:/data" ^
+  -v "%cd%/config:/config" ^
+  lotto-analyzer:0.1.0 ^
+  --input /data/sample.csv ^
+  --config /config/range.json ^
+  --bottom-count 10 ^
+  --window 1y ^
+  --output /data/result.csv
+
+3) Check output
+
+Output file is created at testSample/result.csv on your host machine.
+
+Tip:
+
+- Volume mounts keep input and output files on your local machine.
+
+## Run With Docker Compose
+
+Use this when you want one-command execution from docker-compose.yml.
+
+Linux/macOS:
+
+1) Build and run using compose file
+
+docker compose up --build
+
+2) One-off execution (container removed after run)
+
+docker compose run --rm lotto-analyzer
+
+3) Override arguments (example: custom date window)
+
+docker compose run --rm lotto-analyzer --input /data/sample.csv --config /config/range.json --bottom-count 15 --window custom --start-date 2025-01-01 --end-date 2025-12-31 --output /data/result_custom.csv
+
+Windows PowerShell:
+
+1) Build and run using compose file
+
+docker compose up --build
+
+2) One-off execution (container removed after run)
+
+docker compose run --rm lotto-analyzer
+
+3) Override arguments (example: custom date window)
+
+docker compose run --rm lotto-analyzer --input /data/sample.csv --config /config/range.json --bottom-count 15 --window custom --start-date 2025-01-01 --end-date 2025-12-31 --output /data/result_custom.csv
+
+Windows Command Prompt (cmd.exe):
+
+1) Build and run using compose file
+
+docker compose up --build
+
+2) One-off execution (container removed after run)
+
+docker compose run --rm lotto-analyzer
+
+3) Override arguments (example: custom date window)
+
+docker compose run --rm lotto-analyzer --input /data/sample.csv --config /config/range.json --bottom-count 15 --window custom --start-date 2025-01-01 --end-date 2025-12-31 --output /data/result_custom.csv
+
+Compose output location:
+
+- testSample/result.csv (or the output path you pass in override arguments)

@@ -1,0 +1,20 @@
+services:
+  lotto-analyzer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: lotto-analyzer:0.1.0
+    volumes:
+      - ./testSample:/data
+      - ./config:/config
+    command:
+      - --input
+      - /data/sample.csv
+      - --config
+      - /config/range.json
+      - --bottom-count
+      - "10"
+      - --window
+      - 1y
+      - --output
+      - /data/result.csv
