@@ -65,6 +65,23 @@ Create test CSV data by date range (latest date at top):
 
 python testSample/createCSVtest.py --from-date 2025-07-20 --to-date 2026-07-19 --seed 20071991 --output testSample/sample.csv
 
+## Collect webpage data
+
+Run the collector directly with a URL and output path:
+
+PYTHONPATH=src python3 -m data_collector.data_collect https://example.com --output output/example.txt
+
+Or use a JSON config file containing both the target URL and output path:
+
+PYTHONPATH=src python3 -m data_collector.data_collect --config config/collector_config.json
+
+Example config format:
+
+{
+  "url": "https://www.singaporepools.com.sg/en/product/pages/toto_results.aspx",
+  "output": "output/toto_results.txt"
+}
+
 ## Test
 
 python -m unittest discover -s tests -p "test_*.py"
