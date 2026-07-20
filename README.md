@@ -67,19 +67,19 @@ python testSample/createCSVtest.py --from-date 2025-07-20 --to-date 2026-07-19 -
 
 ## Collect webpage data
 
-Run the collector directly with a URL and output path:
+Run the collector directly on the root folder with json config:
 
-PYTHONPATH=src python3 -m data_collector.data_collect https://example.com --output output/example.txt
+python src/data_collector/data_collect.py
 
-Or use a JSON config file containing both the target URL and output path:
-
-PYTHONPATH=src python3 -m data_collector.data_collect --config config/collector_config.json
-
+config file include "date" tag
+if it's empty mean collecting all the data
+if it's has value with format: DD-MMM-YYYY (example: 16-Jul-2026), all the data after that date will be collected
 Example config format:
 
 {
   "url": "https://www.singaporepools.com.sg/en/product/pages/toto_results.aspx",
   "output": "output/toto_results.txt"
+  "date": "16-Jul-2026"
 }
 
 ## Test

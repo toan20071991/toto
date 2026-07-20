@@ -1,5 +1,7 @@
 {
   "url": "https://www.singaporepools.com.sg/en/product/pages/toto_results.aspx",
   "output": "output/toto_results.csv",
+  "_comment_append": "Set true to append only new rows; false to overwrite output file.",
+  "append": true,
   "date": ""
 }

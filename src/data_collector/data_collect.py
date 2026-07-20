@@ -2,6 +2,7 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 from bs4 import BeautifulSoup
 from datetime import datetime
+import argparse
 import json
 import time
 import re
@@ -145,24 +146,49 @@ def parse_draw_table(html_content, default_date_str):
     return f"{formatted_date},{','.join(winning_numbers)},{additional_num}"
 
 
-def save_to_csv(data_rows, filename=OUTPUT_FILE):
+def save_to_csv(data_rows, filename=OUTPUT_FILE, append=False):
     """Writes the gathered lottery rows into a structured CSV file with proper headers."""
     if not data_rows:
         print("\nNo data collected to save.")
         return
 
     try:
+        if append:
+            existing_rows = []
+            existing_rows_set = set()
+            file_path = Path(filename)
+
+            if file_path.exists():
+                with open(filename, mode="r", encoding="utf-8") as file:
+                    existing_rows = [line.strip() for line in file if line.strip()]
+                    existing_rows_set = set(existing_rows)
+
+            new_rows = [row for row in data_rows if row not in existing_rows_set]
+            if not new_rows:
+                print(f"\nNo new rows to append to '{filename}'")
+                return
+
+            # Put new unique rows at the top, then keep existing rows below.
+            with open(filename, mode="w", encoding="utf-8") as file:
+                for row in new_rows:
+                    file.write(f"{row}\n")
+                for row in existing_rows:
+                    file.write(f"{row}\n")
+
+            print(f"\nSuccessfully prepended {len(new_rows)} new rows to '{filename}'")
+            return
+
         with open(filename, mode="w", encoding="utf-8") as file:
             # Write each generated combination line row by row
             for row in data_rows:
                 file.write(f"{row}\n")
-                
+
         print(f"\nSuccessfully saved {len(data_rows)} rows to '{filename}'")
     except IOError as e:
         print(f"Error saving data to CSV file: {e}")
 
 
-def main():
+def main(append=False):
     limit_date = parse_date(TARGET_DATE_STR)
     
     with sync_playwright() as p:
@@ -208,7 +234,14 @@ def main():
                 
         browser.close()
 
-    save_to_csv(collected_rows)
+    save_to_csv(collected_rows, append=append)
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--append",
+        action="store_true",
+        help="Prepend only new rows to the top of the output file.",
+    )
+    args = parser.parse_args()
+    main(append=args.append)
