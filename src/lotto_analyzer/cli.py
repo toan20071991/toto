@@ -24,7 +24,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="Config JSON path containing min_value and max_value",
     )
     parser.add_argument("--bottom-count", type=int, default=10, help="Minimum number of least-appearing combos to output")
-    parser.add_argument("--window", choices=["3m", "1y", "2y", "custom"], default="1y")
+    parser.add_argument(
+        "--window",
+        choices=["3m", "1y", "2y", "custom"],
+        default=None,
+        help="Date window preset; if omitted, use all available data",
+    )
     parser.add_argument("--start-date", type=_parse_date_arg, help="Custom start date YYYY-MM-DD")
     parser.add_argument("--end-date", type=_parse_date_arg, help="Custom end date YYYY-MM-DD")
     return parser

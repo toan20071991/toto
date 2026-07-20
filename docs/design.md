@@ -49,6 +49,7 @@ Output row fields:
 3. Validate config bounds as positive integers with `min_value <= max_value`.
 4. Validate each number against configured bounds and keep row values as individual observations.
 5. Resolve date window:
+  - if no date range is specified: use all available data (`min(draw_date)` to `max(draw_date)`)
    - `3m`: end date minus 90 days
    - `1y`: end date minus 365 days
    - `2y`: end date minus 730 days

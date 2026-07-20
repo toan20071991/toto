@@ -13,7 +13,7 @@
 - RQ-004: The system shall load numeric range settings from a config file and validate each number `n1..n7` against that configured range.
 - RQ-004a: The configured range bounds shall be positive integers with `min_value <= max_value`.
 - RQ-005: The system shall treat each valid `n1..n7` value as an individual observation for frequency analysis.
-- RQ-006: The system shall support date filtering with presets `3m`, `1y`, `2y`, and custom start/end range.
+- RQ-006: The system shall support date filtering with presets `3m`, `1y`, `2y`, and custom start/end range; if no date range is specified, filtering shall include all available data.
 - RQ-007: The system shall compute frequency by number value across all filtered valid numeric cells (`n1..n7`).
 - RQ-007a: The frequency candidate set shall include every integer in configured range [`min_value`, `max_value`], and numbers not present in filtered data shall have frequency 0.
 - RQ-008: The system shall compute percentage of each number over total filtered valid numeric cells.

@@ -99,6 +99,28 @@ class AnalyzerTests(unittest.TestCase):
         self.assertEqual(len(rows), 21)
         self.assertEqual(rows[0].rank, 1)
 
+    def test_none_window_uses_all_data(self) -> None:
+        records = [
+            DrawRecord(date(2026, 1, 1), (1, 2, 3, 4, 5, 6, 7)),
+            DrawRecord(date(2026, 1, 2), (1, 2, 3, 4, 5, 6, 8)),
+            DrawRecord(date(2026, 1, 3), (1, 2, 3, 4, 5, 6, 9)),
+        ]
+        summary = ParseSummary(total_rows=3, valid_rows=3, invalid_rows=0)
+
+        rows, analysis = analyze_least_combinations(
+            records=records,
+            parse_summary=summary,
+            bottom_count=5,
+            window=None,
+            min_value=1,
+            max_value=9,
+        )
+
+        self.assertEqual(analysis.filtered_rows, 3)
+        self.assertEqual(analysis.total_numeric_cells, 21)
+        self.assertEqual(analysis.unique_numbers, 9)
+        self.assertGreaterEqual(len(rows), 5)
+
 
 if __name__ == "__main__":
     unittest.main()

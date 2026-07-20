@@ -11,7 +11,7 @@ from .models import AnalysisRow, AnalysisSummary, DrawRecord, ParseSummary
 
 def _resolve_date_range(
     records: Sequence[DrawRecord],
-    window: str,
+    window: str | None,
     custom_start: date | None,
     custom_end: date | None,
 ) -> tuple[date, date]:
@@ -25,6 +25,9 @@ def _resolve_date_range(
     if not records:
         today = date.today()
         return today, today
+
+    if window is None:
+        return min(r.draw_date for r in records), max(r.draw_date for r in records)
 
     end = custom_end or max(r.draw_date for r in records)
     if window == "3m":
@@ -40,7 +43,7 @@ def analyze_least_combinations(
     records: Sequence[DrawRecord],
     parse_summary: ParseSummary,
     bottom_count: int,
-    window: str,
+    window: str | None,
     custom_start: date | None = None,
     custom_end: date | None = None,
     min_value: int | None = None,
@@ -112,7 +115,7 @@ def analyze_least_numbers(
     records: Sequence[DrawRecord],
     parse_summary: ParseSummary,
     bottom_count: int,
-    window: str,
+    window: str | None,
     custom_start: date | None = None,
     custom_end: date | None = None,
     min_value: int | None = None,
