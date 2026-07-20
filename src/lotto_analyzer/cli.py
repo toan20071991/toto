@@ -5,7 +5,7 @@ import csv
 from datetime import datetime
 from pathlib import Path
 
-from .analyzer import analyze_least_combinations
+from .analyzer import analyze_least_numbers
 from .config import load_range_config
 from .parser import parse_csv_file
 
@@ -23,10 +23,10 @@ def build_parser() -> argparse.ArgumentParser:
         default="config/range.json",
         help="Config JSON path containing min_value and max_value",
     )
-    parser.add_argument("--bottom-count", type=int, default=10, help="Minimum number of least-appearing combos to output")
+    parser.add_argument("--bottom-count", type=int, default=10, help="Minimum number of least-appearing numbers to output")
     parser.add_argument(
         "--window",
-        choices=["3m", "1y", "2y", "custom"],
+        choices=["3m", "6m", "1y", "2y", "custom"],
         default=None,
         help="Date window preset; if omitted, use all available data",
     )
@@ -43,11 +43,13 @@ def _write_output(path: str | Path, rows, summary) -> None:
         writer.writerow(
             [
                 "rank",
-                "combo",
+                "number",
+                "frequency",
+                "percentage",
             ]
         )
         for row in rows:
-            writer.writerow([row.rank, " ".join(str(n) for n in row.combo)])
+            writer.writerow([row.rank, row.number, row.frequency, f"{row.percentage:.3f}"])
 
     print("Summary")
     print(f"total_rows={summary.total_rows}")
@@ -76,7 +78,7 @@ def main() -> None:
         min_value=range_config.min_value,
         max_value=range_config.max_value,
     )
-    rows, summary = analyze_least_combinations(
+    rows, summary = analyze_least_numbers(
         records=records,
         parse_summary=parse_summary,
         bottom_count=args.bottom_count,

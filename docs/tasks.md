@@ -1,10 +1,10 @@
 # Tasks (Gate 3)
 
 ## Metadata
-- Task Plan Version: 1.6.0
-- Status: Completed (v1.6.0 delta implementation for T-005 through T-007)
-- Linked Requirement Version: 1.6.0
-- Linked Design Version: 1.6.0
+- Task Plan Version: 1.7.0
+- Status: Planned (v1.7.0 delta update for ranking output behavior)
+- Linked Requirement Version: 1.7.0
+- Linked Design Version: 1.7.0
 
 ## Task Backlog
 
@@ -29,32 +29,32 @@
 - T-004: Implement date window resolution and date-range filter.
   - Depends on: T-001
   - Maps to: RQ-006
-  - Done when: 3m/1y/2y/custom date filtering passes tests.
+  - Done when: 3m/6m/1y/2y/custom date filtering passes tests.
   - Current state: Completed on 2026-07-19.
 
-- T-005: Implement per-number frequency, percentage, configured-range candidate expansion (including zero-frequency numbers), 6-number combo ranking, and bottom-count tie-inclusive cutoff selection.
+- T-005: Implement per-number frequency, configured-range candidate expansion (including zero-frequency numbers), least-to-most number ranking, and bottom-count tie-inclusive cutoff selection.
   - Depends on: T-003, T-004
   - Maps to: RQ-007, RQ-007a, RQ-008, RQ-009, RQ-010
-  - Done when: ranking candidate set always includes full `[min_value,max_value]`, never-seen numbers are counted as zero, combination ranking is deterministic, and tie-inclusive cutoff returns at least `bottom-count` rows.
-  - Current state: Completed on 2026-07-19.
+  - Done when: ranking candidate set always includes full `[min_value,max_value]`, never-seen numbers are counted as zero, ranking order is deterministic `(frequency asc, number asc)`, and tie-inclusive cutoff returns at least `bottom-count` rows.
+  - Current state: Completed on 2026-07-20.
 
-- T-006: Implement CLI orchestration and CSV export for 6-number combo results.
+- T-006: Implement CLI orchestration and CSV export for ranked number results.
   - Depends on: T-002, T-003, T-004, T-005
   - Maps to: RQ-011, RQ-012, NFR-002, NFR-004
-  - Done when: command runs end-to-end, accepts config path, and writes combo output CSV derived from v1.6.0 bottom-count tie-inclusive behavior.
-  - Current state: Completed on 2026-07-19.
+  - Done when: command runs end-to-end, accepts config path, and writes ranked-number output CSV with `number`, `frequency`, and `percentage` columns from bottom-count tie-inclusive behavior.
+  - Current state: Completed on 2026-07-20.
 
-- T-007: Implement unit tests and sample fixtures for config, candidate-set selection, and combo generation behavior.
+- T-007: Implement unit tests and sample fixtures for config, candidate-set selection, ranked-number cutoff behavior, and percentage rounding.
   - Depends on: T-002, T-003, T-004, T-005, T-006
-  - Maps to: NFR-001, NFR-003
-  - Done when: tests cover config bounds, parsing, date filter, zero-frequency candidate inclusion, bottom-count cutoff, tie-inclusive expansion, and output determinism.
-  - Current state: Completed on 2026-07-19.
+  - Maps to: RQ-008, RQ-009, RQ-010, NFR-001, NFR-003
+  - Done when: tests cover config bounds, parsing, date filter, zero-frequency candidate inclusion, deterministic ranked ordering, bottom-count cutoff, tie-inclusive expansion, and 3-decimal percentage rounding.
+  - Current state: Completed on 2026-07-20.
 
 - T-008: Remove legacy assumptions from older requirement baselines.
   - Depends on: T-003, T-005, T-006
   - Maps to: RQ-001..RQ-012, RQ-007a, NFR-001
-  - Done when: no fixed `1..99` assumption remains in parser/analyzer/tests and no stale combination-row output schema remains.
-  - Current state: Completed on 2026-07-19.
+  - Done when: no fixed `1..99` assumption remains in parser/analyzer/tests and no stale combination-row output schema or logic remains.
+  - Current state: Completed on 2026-07-20.
 
 - T-009: Keep historical cleanup record from v1.1.0 migration.
   - Depends on: none

@@ -192,3 +192,46 @@
 - Notes:
   - CLI parameter migrated from x-percent to bottom-count.
   - Analyzer now ranks 6-number combinations by aggregate member-number frequency score and includes all rows tied at cutoff.
+
+### TR-009
+- Task ID: T-005 to T-007 (v1.7.0 ranked-number implementation batch)
+- Date: 2026-07-20
+- Executor: Copilot
+- Command(s):
+  - u:/01_SourceCode/98_Personal/01_toto/.venv/Scripts/python.exe -m unittest discover -s tests -p "test_*.py"
+  - u:/01_SourceCode/98_Personal/01_toto/.venv/Scripts/python.exe -m lotto_analyzer.cli --input .\output\toto_results_test.csv --config .\config\range.json --bottom-count 10 --output result.csv --window 1y
+- Inputs:
+  - docs/requirements.md v1.7.0
+  - docs/design.md v1.7.0
+  - docs/tasks.md v1.7.0
+  - output/toto_results_test.csv
+  - config/range.json
+  - bottom-count=10
+  - window=1y
+- Output/Evidence:
+  - unit tests passed: 9 passed, 0 failed
+  - CLI summary: total_rows=298, valid_rows=298, invalid_rows=0, filtered_rows=105, total_numeric_cells=735, unique_numbers=49, result_rows=11
+  - output schema verified: rank,number,frequency,percentage
+  - sample output percentages formatted to 3 decimals (e.g., 0.952, 1.497, 1.633)
+- Result: PASS
+- Notes:
+  - Replaced combination generation/ranking with deterministic per-number ranking `(frequency asc, number asc)`.
+  - Tie-inclusive cutoff applied to frequency at requested `bottom-count` boundary.
+
+### TR-010
+- Task ID: T-008 (legacy assumption cleanup for v1.7.0)
+- Date: 2026-07-20
+- Executor: Copilot
+- Command(s):
+  - u:/01_SourceCode/98_Personal/01_toto/.venv/Scripts/python.exe -m unittest discover -s tests -p "test_*.py"
+  - Source scan: grep for legacy `rank,combo` / `combo` usage in src/lotto_analyzer
+- Inputs:
+  - tests/test_parser.py
+  - src/lotto_analyzer/*
+- Output/Evidence:
+  - Parser test range updated to config-driven bounds (`max_value=60`) while preserving invalid-row coverage with value `100`
+  - unit tests passed: 9 passed, 0 failed
+  - no combo schema string found in core source package
+- Result: PASS
+- Notes:
+  - Removed remaining fixed-range test assumption and verified current source is aligned to ranked-number output model.

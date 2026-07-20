@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from collections import Counter
 from datetime import date, timedelta
-import heapq
-from itertools import combinations
 from typing import Sequence
 
 from .models import AnalysisRow, AnalysisSummary, DrawRecord, ParseSummary
@@ -32,14 +30,16 @@ def _resolve_date_range(
     end = custom_end or max(r.draw_date for r in records)
     if window == "3m":
         return end - timedelta(days=90), end
+    if window == "6m":
+        return end - timedelta(days=180), end
     if window == "1y":
         return end - timedelta(days=365), end
     if window == "2y":
         return end - timedelta(days=730), end
-    raise ValueError("window must be one of: 3m, 1y, 2y, custom")
+    raise ValueError("window must be one of: 3m, 6m, 1y, 2y, custom")
 
 
-def analyze_least_combinations(
+def analyze_least_numbers(
     records: Sequence[DrawRecord],
     parse_summary: ParseSummary,
     bottom_count: int,
@@ -71,34 +71,37 @@ def analyze_least_combinations(
     if min_value is not None and max_value is not None:
         candidate_numbers = list(range(min_value, max_value + 1))
 
-    combo_size = 6
     target_rows = max(1, bottom_count)
-    if len(candidate_numbers) >= combo_size:
-        # First pass finds the cutoff score for the bottom-countth combination.
-        score_heap: list[int] = []
-        for combo in combinations(candidate_numbers, combo_size):
-            score = sum(counter.get(n, 0) for n in combo)
-            if len(score_heap) < target_rows:
-                heapq.heappush(score_heap, -score)
-            elif score < -score_heap[0]:
-                heapq.heapreplace(score_heap, -score)
+    ranked: list[tuple[int, int]] = []
+    for number in candidate_numbers:
+        ranked.append((counter.get(number, 0), number))
+    ranked.sort(key=lambda item: (item[0], item[1]))
 
-        if score_heap:
-            cutoff_score = -score_heap[0]
-            selected: list[tuple[int, tuple[int, int, int, int, int, int]]] = []
-            for combo in combinations(candidate_numbers, combo_size):
-                score = sum(counter.get(n, 0) for n in combo)
-                if score <= cutoff_score:
-                    selected.append((score, combo))
+    selected: list[tuple[int, int]] = []
+    if ranked:
+        if target_rows >= len(ranked):
+            selected = ranked
+        else:
+            cutoff_frequency = ranked[target_rows - 1][0]
+            selected = [item for item in ranked if item[0] <= cutoff_frequency]
 
-            selected.sort(key=lambda item: (item[0], item[1]))
-            current_rank = 0
-            previous_score: int | None = None
-            for score, combo in selected:
-                if previous_score is None or score != previous_score:
-                    current_rank += 1
-                    previous_score = score
-                rows.append(AnalysisRow(rank=current_rank, combo=combo))
+    current_rank = 0
+    previous_frequency: int | None = None
+    for frequency, number in selected:
+        if previous_frequency is None or frequency != previous_frequency:
+            current_rank += 1
+            previous_frequency = frequency
+        percentage = 0.0
+        if total_numeric_cells > 0:
+            percentage = round((frequency / total_numeric_cells) * 100, 3)
+        rows.append(
+            AnalysisRow(
+                rank=current_rank,
+                number=number,
+                frequency=frequency,
+                percentage=percentage,
+            )
+        )
 
     summary = AnalysisSummary(
         total_rows=parse_summary.total_rows,
@@ -111,7 +114,7 @@ def analyze_least_combinations(
     return rows, summary
 
 
-def analyze_least_numbers(
+def analyze_least_combinations(
     records: Sequence[DrawRecord],
     parse_summary: ParseSummary,
     bottom_count: int,
@@ -121,7 +124,8 @@ def analyze_least_numbers(
     min_value: int | None = None,
     max_value: int | None = None,
 ) -> tuple[list[AnalysisRow], AnalysisSummary]:
-    return analyze_least_combinations(
+    # Backward-compatible alias: this function now returns ranked numbers.
+    return analyze_least_numbers(
         records=records,
         parse_summary=parse_summary,
         bottom_count=bottom_count,

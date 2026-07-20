@@ -6,7 +6,6 @@ from typing import Tuple
 
 
 CombinationKey = Tuple[int, int, int, int, int, int, int]
-Combo6 = Tuple[int, int, int, int, int, int]
 
 
 @dataclass(frozen=True)
@@ -25,7 +24,9 @@ class ParseSummary:
 @dataclass(frozen=True)
 class AnalysisRow:
     rank: int
-    combo: Combo6
+    number: int
+    frequency: int
+    percentage: float
 
 
 @dataclass(frozen=True)

@@ -21,7 +21,7 @@ class ParserTests(unittest.TestCase):
             path = Path(tmp) / "input.csv"
             path.write_text(content, encoding="utf-8")
 
-            records, summary = parse_csv_file(path, min_value=1, max_value=99)
+            records, summary = parse_csv_file(path, min_value=1, max_value=60)
 
         self.assertEqual(summary.total_rows, 4)
         self.assertEqual(summary.valid_rows, 1)

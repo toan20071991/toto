@@ -1,15 +1,15 @@
-# Lottery Combination Analyzer
+# Lottery Number Frequency Analyzer
 
 This project implements a stage-gated workflow and a Python CLI tool for analyzing least-appearing lottery numbers.
 
 ## Requirement Baseline
 
-- Current requirement version: 1.6.0
+- Current requirement version: 1.7.0
 - Requirement source: docs/requirements.md
 - Design source: docs/design.md
 - Task source: docs/tasks.md
 
-## Target Input Contract (Requirements v1.6.0)
+## Target Input Contract (Requirements v1.7.0)
 
 - CSV rows with no header and no footer
 - Exact column order:
@@ -28,19 +28,27 @@ This project implements a stage-gated workflow and a Python CLI tool for analyzi
 
 ## Current Implementation Note
 
-- Implementation is aligned with requirements v1.6.0, including configured-range candidate expansion, count-based output selection (`bottom-count`), and tie-inclusive cutoff.
+- Implementation is aligned with requirements v1.7.0, including configured-range candidate expansion, count-based output selection (`bottom-count`), deterministic least-to-most number ranking, and tie-inclusive cutoff.
 - Task execution evidence is tracked in docs/task-results.md.
 
 ## Current Analysis Rule
 
 - Frequency is computed per number across all filtered `n1..n7` cells
 - Candidate set includes all values in configured range `[min_value,max_value]`; unseen values are treated as count 0
-- Percentage uses denominator `total_numeric_cells`
-- Least-appearing selection ranks 6-number combinations using aggregate member-number frequency score
+- Percentage uses denominator `total_numeric_cells` and is rounded to 3 decimal places
+- Least-appearing selection ranks individual numbers from least appearance to most appearance
 - Input parameter is `bottom-count` (integer), interpreted as minimum result count
-- If multiple combinations tie at the cutoff rank, all tied combinations are included
+- If multiple numbers tie at the cutoff rank, all tied numbers are included
 - Therefore, output row count is at least `bottom-count` and can be larger due to ties
-- Tie break is deterministic by lexical combination ordering
+- Tie break is deterministic by `(frequency asc, number asc)` ordering
+
+## Output Schema
+
+- CSV output columns:
+  - rank
+  - number
+  - frequency
+  - percentage
 
 ## Project Structure
 
@@ -60,6 +68,10 @@ Examples:
 
 python -m lotto_analyzer.cli --input data.csv --config config/range.json --bottom-count 5 --window 3m --output result.csv
 python -m lotto_analyzer.cli --input data.csv --config config/range.json --bottom-count 15 --window custom --start-date 2024-01-01 --end-date 2025-12-31 --output result.csv
+
+Sample output header:
+
+rank,number,frequency,percentage
 
 Create test CSV data by date range (latest date at top):
 
