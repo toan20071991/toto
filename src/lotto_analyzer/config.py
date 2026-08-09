@@ -11,6 +11,19 @@ class RangeConfig:
     max_value: int
 
 
+@dataclass
+class AnalyzerConfig:
+    input: str = "output/toto_results.csv"
+    output: str = "output/analyze_result.csv"
+    range_config: str = "config/range.json"
+    mode: str = "least"
+    bottom_count: int | None = 10
+    top_count: int | None = None
+    window: str | None = None
+    start_date: str | None = None
+    end_date: str | None = None
+
+
 def _as_positive_int(value: object, field_name: str) -> int:
     if not isinstance(value, int):
         raise ValueError(f"Config field '{field_name}' must be an integer.")
@@ -38,3 +51,29 @@ def load_range_config(config_path: str | Path) -> RangeConfig:
         raise ValueError("Config bounds are invalid: min_value must be <= max_value.")
 
     return RangeConfig(min_value=min_value, max_value=max_value)
+
+
+def load_analyzer_config(config_path: str | Path = "config/analyzer_config.json") -> AnalyzerConfig:
+    path = Path(config_path)
+    if not path.exists():
+        return AnalyzerConfig()
+
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"Analyzer config file is not valid JSON: {path}") from exc
+
+    if not isinstance(raw, dict):
+        raise ValueError("Analyzer config JSON must be an object.")
+
+    return AnalyzerConfig(
+        input=raw.get("input", "output/toto_results.csv"),
+        output=raw.get("output", "output/analyze_result.csv"),
+        range_config=raw.get("range_config", "config/range.json"),
+        mode=raw.get("mode", "least"),
+        bottom_count=raw.get("bottom_count"),
+        top_count=raw.get("top_count"),
+        window=raw.get("window"),
+        start_date=raw.get("start_date"),
+        end_date=raw.get("end_date"),
+    )

@@ -188,12 +188,48 @@ def save_to_csv(data_rows, filename=OUTPUT_FILE, append=False):
         print(f"Error saving data to CSV file: {e}")
 
 
-def main(append=False):
-    limit_date = parse_date(TARGET_DATE_STR)
-    
+from datetime import datetime, timedelta
+
+def get_latest_existing_date(filename):
+    """Inspects existing CSV file and returns the datetime of the top (latest) row."""
+    file_path = Path(filename)
+    if not file_path.exists():
+        return None
+    try:
+        with open(filename, mode="r", encoding="utf-8") as file:
+            for line in file:
+                line = line.strip()
+                if line:
+                    parts = line.split(",")
+                    if parts:
+                        parsed = parse_date(parts[0])
+                        if parsed:
+                            return parsed
+    except Exception:
+        pass
+    return None
+
+
+def main(append=None):
+    if append is None:
+        append = config.get("append", True)
+
+    file_latest_date = get_latest_existing_date(OUTPUT_FILE)
+
+    if file_latest_date:
+        limit_date = file_latest_date
+        print(f"Existing data found up to {file_latest_date.strftime('%Y-%m-%d')}. Collecting newer draws...", flush=True)
+    elif TARGET_DATE_STR:
+        limit_date = parse_date(TARGET_DATE_STR)
+    else:
+        limit_date = datetime.now() - timedelta(days=365)
+        print(f"No existing data found. Defaulting collection boundary to 1 year ago ({limit_date.strftime('%Y-%m-%d')})...", flush=True)
+
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
-        page = browser.new_page()
+        page = browser.new_page(
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        )
         
         print("Navigating to Singapore Pools...", flush=True)
         page.goto(URL, wait_until="domcontentloaded")
@@ -214,12 +250,12 @@ def main(append=False):
 
         print("\n--- STARTING DATA EXTRACTION ---", flush=True)
         collected_rows = []
-        
+            
         for draw_item in available_draws:
             current_date_obj = parse_date(draw_item['text'])
 
-            if limit_date and current_date_obj and current_date_obj < limit_date:
-                print(f"Reached boundary date ({draw_item['text']}). Stopping collection loop.")
+            if limit_date and current_date_obj and current_date_obj <= limit_date:
+                print(f"Reached boundary/existing date ({draw_item['text']}). Stopping collection loop.")
                 break
 
             try:
@@ -241,6 +277,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--append",
         action="store_true",
+        default=None,
         help="Prepend only new rows to the top of the output file.",
     )
     args = parser.parse_args()

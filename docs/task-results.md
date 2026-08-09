@@ -235,3 +235,51 @@
 - Result: PASS
 - Notes:
   - Removed remaining fixed-range test assumption and verified current source is aligned to ranked-number output model.
+
+### TR-011
+- Task ID: T-010 (top-count most-appearing number implementation)
+- Date: 2026-08-09
+- Executor: Copilot
+- Command(s):
+  - PYTHONPATH=src .venv/bin/python -m unittest discover -s tests -p "test_*.py"
+  - PYTHONPATH=src .venv/bin/python -m lotto_analyzer.cli --input output/toto_results.csv --config config/range.json --top-count 10 --output output/analyze_result.csv
+- Inputs:
+  - docs/requirements.md v1.8.0
+  - docs/design.md v1.8.0
+  - docs/tasks.md v1.8.0
+  - output/toto_results.csv
+  - config/range.json
+  - top-count=10
+- Output/Evidence:
+  - unit tests passed: 10 passed, 0 failed
+  - CLI summary: total_rows=320, valid_rows=320, invalid_rows=0, filtered_rows=320, total_numeric_cells=2240, unique_numbers=49, result_rows=10
+  - output schema verified: rank,number,frequency,percentage
+  - top ranked numbers: Rank 1: 37 (freq 60, 2.679%), Rank 2: 28 (freq 57, 2.545%), Rank 3: 31 (freq 56, 2.500%)
+- Result: PASS
+- Notes:
+  - Implemented `analyze_most_numbers` and `analyze_numbers(mode='most')` for most-appearing number ranking with deterministic ordering `(frequency desc, number asc)`.
+  - Added CLI options `--top-count` and `--mode`.
+
+### TR-012
+- Task ID: T-011 (JSON configuration file loading and short-form CLI execution)
+- Date: 2026-08-09
+- Executor: Copilot
+- Command(s):
+  - PYTHONPATH=src .venv/bin/python -m unittest discover -s tests -p "test_*.py"
+  - PYTHONPATH=src .venv/bin/python -m lotto_analyzer.cli
+  - PYTHONPATH=src .venv/bin/python -m lotto_analyzer.cli config/analyzer_config.json
+  - PYTHONPATH=src .venv/bin/python -m lotto_analyzer.cli --mode most --top-count 5
+- Inputs:
+  - docs/requirements.md v1.9.0
+  - docs/design.md v1.9.0
+  - docs/tasks.md v1.9.0
+  - config/analyzer_config.json
+- Output/Evidence:
+  - unit tests passed: 11 passed, 0 failed
+  - short-form execution with zero arguments succeeded (loaded default `config/analyzer_config.json`)
+  - positional argument execution succeeded (`config/analyzer_config.json`)
+  - explicit CLI flags override JSON config parameters successfully (`--mode most --top-count 5`)
+- Result: PASS
+- Notes:
+  - Implemented `load_analyzer_config` in `config.py` and updated `cli.py` to merge CLI flags over JSON configuration settings.
+

@@ -3,7 +3,7 @@ from __future__ import annotations
 import unittest
 from datetime import date
 
-from lotto_analyzer.analyzer import analyze_least_numbers
+from lotto_analyzer.analyzer import analyze_least_numbers, analyze_most_numbers, analyze_numbers
 from lotto_analyzer.models import DrawRecord, ParseSummary
 
 
@@ -34,6 +34,29 @@ class AnalyzerTests(unittest.TestCase):
         self.assertEqual(rows[0].number, 8)
         self.assertEqual(rows[0].frequency, 0)
         self.assertEqual(rows[0].percentage, 0.0)
+
+    def test_analyze_most_numbers_returns_highest_frequencies_first(self) -> None:
+        records = [
+            DrawRecord(date(2026, 1, 1), (1, 2, 3, 4, 5, 6, 7)),
+            DrawRecord(date(2026, 1, 2), (1, 2, 4, 3, 9, 10, 11)),
+        ]
+        summary = ParseSummary(total_rows=2, valid_rows=2, invalid_rows=0)
+
+        rows, analysis = analyze_most_numbers(
+            records=records,
+            parse_summary=summary,
+            top_count=4,
+            window=None,
+            min_value=1,
+            max_value=11,
+        )
+
+        self.assertEqual(analysis.filtered_rows, 2)
+        self.assertEqual(analysis.total_numeric_cells, 14)
+        # Numbers 1, 2, 3, 4 each appear twice
+        self.assertEqual(len(rows), 4)
+        self.assertEqual(rows[0].rank, 1)
+        self.assertEqual(rows[0].frequency, 2)
 
     def test_date_range_filter(self) -> None:
         records = [

@@ -1,10 +1,10 @@
 # Tasks (Gate 3)
 
 ## Metadata
-- Task Plan Version: 1.7.0
-- Status: Planned (v1.7.0 delta update for ranking output behavior)
-- Linked Requirement Version: 1.7.0
-- Linked Design Version: 1.7.0
+- Task Plan Version: 1.9.0
+- Status: Planned (v1.9.0 update for analyzer_config.json short-form execution)
+- Linked Requirement Version: 1.9.0
+- Linked Design Version: 1.9.0
 
 ## Task Backlog
 
@@ -61,6 +61,18 @@
   - Maps to: NFR-001
   - Done when: documentation records that T-007 priority-removal migration was completed.
   - Current state: Completed on 2026-07-19.
+
+- T-010: Implement `top-count` selection and most-appearing number ranking option.
+  - Depends on: T-005, T-006
+  - Maps to: RQ-009a, RQ-010, RQ-011, AC-012
+  - Done when: `analyze_most_numbers` / `top-count` ranks numbers from highest frequency to lowest frequency with deterministic tie handling `(frequency desc, number asc)`, CLI supports `--top-count` and `--mode`, unit tests pass, and exported CSV results match spec.
+  - Current state: Completed on 2026-08-09.
+
+- T-011: Implement JSON configuration file loading (`config/analyzer_config.json`) and short-form CLI execution.
+  - Depends on: T-006, T-010
+  - Maps to: RQ-013, RQ-013a, AC-013, NFR-002, NFR-003
+  - Done when: `config.py` loads `analyzer_config.json`, CLI supports short-form invocation with zero arguments or single config path argument, explicit CLI flags override JSON config values, and unit tests pass.
+  - Current state: Completed on 2026-08-09.
 
 ## Gate Checklist
 - Requirement mappings complete.

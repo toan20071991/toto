@@ -1,0 +1,11 @@
+{
+  "input": "output/toto_results.csv",
+  "output": "output/analyze_result.csv",
+  "range_config": "config/range.json",
+  "mode": "least",
+  "bottom_count": 10,
+  "top_count": null,
+  "window": "1y",
+  "start_date": null,
+  "end_date": null
+}

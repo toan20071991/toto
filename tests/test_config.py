@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from lotto_analyzer.config import load_range_config
+from lotto_analyzer.config import load_analyzer_config, load_range_config
 
 
 class ConfigTests(unittest.TestCase):
@@ -25,6 +25,22 @@ class ConfigTests(unittest.TestCase):
 
             with self.assertRaises(ValueError):
                 load_range_config(path)
+
+    def test_load_analyzer_config(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "analyzer_config.json"
+            path.write_text(
+                '{"input": "in.csv", "output": "out.csv", "mode": "most", "top_count": 5, "window": "6m"}',
+                encoding="utf-8",
+            )
+
+            cfg = load_analyzer_config(path)
+
+        self.assertEqual(cfg.input, "in.csv")
+        self.assertEqual(cfg.output, "out.csv")
+        self.assertEqual(cfg.mode, "most")
+        self.assertEqual(cfg.top_count, 5)
+        self.assertEqual(cfg.window, "6m")
 
 
 if __name__ == "__main__":

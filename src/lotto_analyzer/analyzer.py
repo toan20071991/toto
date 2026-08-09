@@ -39,18 +39,21 @@ def _resolve_date_range(
     raise ValueError("window must be one of: 3m, 6m, 1y, 2y, custom")
 
 
-def analyze_least_numbers(
+def analyze_numbers(
     records: Sequence[DrawRecord],
     parse_summary: ParseSummary,
-    bottom_count: int,
-    window: str | None,
+    count: int = 10,
+    mode: str = "least",
+    window: str | None = None,
     custom_start: date | None = None,
     custom_end: date | None = None,
     min_value: int | None = None,
     max_value: int | None = None,
 ) -> tuple[list[AnalysisRow], AnalysisSummary]:
-    if bottom_count < 0:
-        raise ValueError("bottom_count must be >= 0")
+    if count < 0:
+        raise ValueError("count must be >= 0")
+    if mode not in ("least", "most"):
+        raise ValueError("mode must be 'least' or 'most'")
     if (min_value is None) != (max_value is None):
         raise ValueError("min_value and max_value must be provided together")
     if min_value is not None and max_value is not None and min_value > max_value:
@@ -71,19 +74,28 @@ def analyze_least_numbers(
     if min_value is not None and max_value is not None:
         candidate_numbers = list(range(min_value, max_value + 1))
 
-    target_rows = max(1, bottom_count)
+    target_rows = max(1, count)
     ranked: list[tuple[int, int]] = []
     for number in candidate_numbers:
         ranked.append((counter.get(number, 0), number))
-    ranked.sort(key=lambda item: (item[0], item[1]))
 
     selected: list[tuple[int, int]] = []
-    if ranked:
-        if target_rows >= len(ranked):
-            selected = ranked
-        else:
-            cutoff_frequency = ranked[target_rows - 1][0]
-            selected = [item for item in ranked if item[0] <= cutoff_frequency]
+    if mode == "most":
+        ranked.sort(key=lambda item: (-item[0], item[1]))
+        if ranked:
+            if target_rows >= len(ranked):
+                selected = ranked
+            else:
+                cutoff_frequency = ranked[target_rows - 1][0]
+                selected = [item for item in ranked if item[0] >= cutoff_frequency]
+    else:  # "least"
+        ranked.sort(key=lambda item: (item[0], item[1]))
+        if ranked:
+            if target_rows >= len(ranked):
+                selected = ranked
+            else:
+                cutoff_frequency = ranked[target_rows - 1][0]
+                selected = [item for item in ranked if item[0] <= cutoff_frequency]
 
     current_rank = 0
     previous_frequency: int | None = None
@@ -114,17 +126,62 @@ def analyze_least_numbers(
     return rows, summary
 
 
-def analyze_least_combinations(
+def analyze_least_numbers(
     records: Sequence[DrawRecord],
     parse_summary: ParseSummary,
     bottom_count: int,
-    window: str | None,
+    window: str | None = None,
     custom_start: date | None = None,
     custom_end: date | None = None,
     min_value: int | None = None,
     max_value: int | None = None,
 ) -> tuple[list[AnalysisRow], AnalysisSummary]:
-    # Backward-compatible alias: this function now returns ranked numbers.
+    return analyze_numbers(
+        records=records,
+        parse_summary=parse_summary,
+        count=bottom_count,
+        mode="least",
+        window=window,
+        custom_start=custom_start,
+        custom_end=custom_end,
+        min_value=min_value,
+        max_value=max_value,
+    )
+
+
+def analyze_most_numbers(
+    records: Sequence[DrawRecord],
+    parse_summary: ParseSummary,
+    top_count: int,
+    window: str | None = None,
+    custom_start: date | None = None,
+    custom_end: date | None = None,
+    min_value: int | None = None,
+    max_value: int | None = None,
+) -> tuple[list[AnalysisRow], AnalysisSummary]:
+    return analyze_numbers(
+        records=records,
+        parse_summary=parse_summary,
+        count=top_count,
+        mode="most",
+        window=window,
+        custom_start=custom_start,
+        custom_end=custom_end,
+        min_value=min_value,
+        max_value=max_value,
+    )
+
+
+def analyze_least_combinations(
+    records: Sequence[DrawRecord],
+    parse_summary: ParseSummary,
+    bottom_count: int,
+    window: str | None = None,
+    custom_start: date | None = None,
+    custom_end: date | None = None,
+    min_value: int | None = None,
+    max_value: int | None = None,
+) -> tuple[list[AnalysisRow], AnalysisSummary]:
     return analyze_least_numbers(
         records=records,
         parse_summary=parse_summary,
