@@ -78,19 +78,19 @@ Analyzer commands:
 
 1. **Short-Form (Default Config)**:
    ```bash
-   python -m lotto_analyzer.cli
+   python -m src.lotto_analyzer.cli
    ```
    *Loads parameters from `config/analyzer_config.json` automatically.*
 
 2. **Custom Config File**:
    ```bash
-   python -m lotto_analyzer.cli custom_config.json
+   python -m src.lotto_analyzer.cli custom_config.json
    ```
 
 3. **Explicit CLI Flags (Overrides Config File)**:
    ```bash
-   python -m lotto_analyzer.cli --input data.csv --config config/range.json --bottom-count 10 --window 1y --output result.csv
-   python -m lotto_analyzer.cli --top-count 10 --mode most
+   python -m src.lotto_analyzer.cli --input data.csv --config config/range.json --bottom-count 10 --window 1y --output result.csv
+   python -m src.lotto_analyzer.cli --top-count 10 --mode most
    ```
 
 ### Analyzer Configuration (`config/analyzer_config.json`)
