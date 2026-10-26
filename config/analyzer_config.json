@@ -1,10 +1,12 @@
 {
   "input": "output/toto_results.csv",
   "output": "output/analyze_result.csv",
+  "suggestion_output": "output/suggestion_numbers.csv",
   "range_config": "config/range.json",
+  "recent_draw_count": 3,
   "mode": "most",
-  "bottom_count": 20,
-  "top_count": null,
+  "bottom_count": null,
+  "top_count": 20,
   "window": "1y",
   "start_date": null,
   "end_date": null

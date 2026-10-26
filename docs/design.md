@@ -47,7 +47,9 @@ Output row fields:
 Analyzer Configuration Schema (`analyzer_config.json`):
 - `input`: string (default `"output/toto_results.csv"`) - Input CSV path.
 - `output`: string (default `"output/analyze_result.csv"`) - Output CSV path.
+- `suggestion_output`: string (default `"output/suggestion_numbers.csv"`) - CSV path for numbers absent from recent draws.
 - `range_config`: string (default `"config/range.json"`) - Path to numeric range configuration JSON file.
+- `recent_draw_count`: positive integer (default `10`) - Number of latest draws used for suggestions.
 - `mode`: string (`"least"` or `"most"`, default `"least"`) - Ranking mode.
 - `bottom_count`: integer (default `10`) - Minimum least-appearing rows to output.
 - `top_count`: integer (optional) - Minimum most-appearing rows to output.
@@ -87,6 +89,7 @@ Analyzer Configuration Schema (`analyzer_config.json`):
 14. Apply count cutoff: include at least `n = max(1, count)` ranked numbers.
 15. If additional numbers share the same cutoff frequency, include all tied numbers.
 16. Emit final ranked numbers in deterministic order (`least` or `most`) to resolved `output` CSV path with `rank`, `number`, `frequency`, and `percentage`.
+17. Select the latest `recent_draw_count` records by draw date, then emit numbers from the ranked analysis results that are absent from those draws to `suggestion_output` with a single `number` column.
 
 ## Traceability
 - RQ-004, RQ-004a -> `config.py`, `parser.py`

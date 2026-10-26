@@ -30,7 +30,8 @@ class ConfigTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "analyzer_config.json"
             path.write_text(
-                '{"input": "in.csv", "output": "out.csv", "mode": "most", "top_count": 5, "window": "6m"}',
+                '{"input": "in.csv", "output": "out.csv", "suggestion_output": "suggest.csv", '
+                '"recent_draw_count": 5, "mode": "most", "top_count": 5, "window": "6m"}',
                 encoding="utf-8",
             )
 
@@ -38,6 +39,8 @@ class ConfigTests(unittest.TestCase):
 
         self.assertEqual(cfg.input, "in.csv")
         self.assertEqual(cfg.output, "out.csv")
+        self.assertEqual(cfg.suggestion_output, "suggest.csv")
+        self.assertEqual(cfg.recent_draw_count, 5)
         self.assertEqual(cfg.mode, "most")
         self.assertEqual(cfg.top_count, 5)
         self.assertEqual(cfg.window, "6m")

@@ -5,7 +5,7 @@ import csv
 from datetime import datetime
 from pathlib import Path
 
-from .analyzer import analyze_numbers
+from .analyzer import analyze_numbers, suggest_numbers
 from .config import load_analyzer_config, load_range_config
 from .parser import parse_csv_file
 
@@ -25,6 +25,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--config-file", dest="flag_config_file", help="Path to analyzer config JSON file")
     parser.add_argument("--input", help="Input CSV path")
     parser.add_argument("--output", help="Output CSV path")
+    parser.add_argument("--suggestion-output", help="Suggestion numbers CSV path")
+    parser.add_argument(
+        "--recent-draw-count",
+        type=int,
+        help="Number of latest draws used to exclude already drawn numbers from suggestions",
+    )
     parser.add_argument(
         "--config",
         dest="range_config",
@@ -75,6 +81,15 @@ def _write_output(path: str | Path, rows, summary) -> None:
     print(f"result_rows={len(rows)}")
 
 
+def _write_suggestions(path: str | Path, numbers: list[int]) -> None:
+    output_path = Path(path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with output_path.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow(["number"])
+        writer.writerows([[number] for number in numbers])
+
+
 def main() -> None:
     parser = build_parser()
     args = parser.parse_args()
@@ -88,7 +103,15 @@ def main() -> None:
 
     input_path = args.input or analyzer_config.input
     output_path = args.output or analyzer_config.output
+    suggestion_output_path = args.suggestion_output or analyzer_config.suggestion_output
     range_config_path = args.range_config or analyzer_config.range_config
+    recent_draw_count = (
+        args.recent_draw_count
+        if args.recent_draw_count is not None
+        else analyzer_config.recent_draw_count
+    )
+    if recent_draw_count <= 0:
+        parser.error("recent_draw_count must be > 0")
     mode = args.mode or analyzer_config.mode or "least"
     bottom_count = args.bottom_count if args.bottom_count is not None else analyzer_config.bottom_count
     top_count = args.top_count if args.top_count is not None else analyzer_config.top_count
@@ -138,6 +161,13 @@ def main() -> None:
         max_value=range_config.max_value,
     )
     _write_output(output_path, rows, summary)
+    suggestions = suggest_numbers(
+        records=records,
+        recent_draw_count=recent_draw_count,
+        candidate_numbers=[row.number for row in rows],
+    )
+    _write_suggestions(suggestion_output_path, suggestions)
+    print(f"suggestion_rows={len(suggestions)}")
 
 
 if __name__ == "__main__":

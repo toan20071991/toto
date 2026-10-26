@@ -172,6 +172,21 @@ def analyze_most_numbers(
     )
 
 
+def suggest_numbers(
+    records: Sequence[DrawRecord],
+    recent_draw_count: int,
+    candidate_numbers: Sequence[int],
+) -> list[int]:
+    if recent_draw_count <= 0:
+        raise ValueError("recent_draw_count must be > 0")
+
+    recent_records = sorted(records, key=lambda record: record.draw_date, reverse=True)[
+        :recent_draw_count
+    ]
+    recent_numbers = {number for record in recent_records for number in record.numbers}
+    return [number for number in candidate_numbers if number not in recent_numbers]
+
+
 def analyze_least_combinations(
     records: Sequence[DrawRecord],
     parse_summary: ParseSummary,

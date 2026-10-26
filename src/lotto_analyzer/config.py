@@ -15,7 +15,9 @@ class RangeConfig:
 class AnalyzerConfig:
     input: str = "output/toto_results.csv"
     output: str = "output/analyze_result.csv"
+    suggestion_output: str = "output/suggestion_numbers.csv"
     range_config: str = "config/range.json"
+    recent_draw_count: int = 10
     mode: str = "least"
     bottom_count: int | None = 10
     top_count: int | None = None
@@ -69,7 +71,9 @@ def load_analyzer_config(config_path: str | Path = "config/analyzer_config.json"
     return AnalyzerConfig(
         input=raw.get("input", "output/toto_results.csv"),
         output=raw.get("output", "output/analyze_result.csv"),
+        suggestion_output=raw.get("suggestion_output", "output/suggestion_numbers.csv"),
         range_config=raw.get("range_config", "config/range.json"),
+        recent_draw_count=_as_positive_int(raw.get("recent_draw_count", 10), "recent_draw_count"),
         mode=raw.get("mode", "least"),
         bottom_count=raw.get("bottom_count"),
         top_count=raw.get("top_count"),

@@ -3,7 +3,12 @@ from __future__ import annotations
 import unittest
 from datetime import date
 
-from lotto_analyzer.analyzer import analyze_least_numbers, analyze_most_numbers, analyze_numbers
+from lotto_analyzer.analyzer import (
+    analyze_least_numbers,
+    analyze_most_numbers,
+    analyze_numbers,
+    suggest_numbers,
+)
 from lotto_analyzer.models import DrawRecord, ParseSummary
 
 
@@ -174,6 +179,21 @@ class AnalyzerTests(unittest.TestCase):
         self.assertEqual(percentage_by_number[2], 28.571)
         self.assertEqual(percentage_by_number[3], 14.286)
         self.assertEqual(percentage_by_number[4], 14.286)
+
+    def test_suggestions_exclude_numbers_in_latest_draws_by_date(self) -> None:
+        records = [
+            DrawRecord(date(2026, 1, 1), (1, 2, 3, 4, 5, 6, 7)),
+            DrawRecord(date(2026, 1, 3), (2, 3, 4, 5, 6, 7, 8)),
+            DrawRecord(date(2026, 1, 2), (1, 3, 4, 5, 6, 7, 8)),
+        ]
+
+        suggestions = suggest_numbers(
+            records=records,
+            recent_draw_count=1,
+            candidate_numbers=[9, 1, 8, 10, 4],
+        )
+
+        self.assertEqual(suggestions, [9, 1, 10])
 
 
 if __name__ == "__main__":

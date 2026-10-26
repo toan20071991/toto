@@ -60,6 +60,7 @@ Example `config/range.json` format:
   - number
   - frequency
   - percentage
+- Suggestion output (`suggestion_output`) contains one `number` column with ranked analysis results absent from the latest `recent_draw_count` draws.
 
 ## Project Structure
 
@@ -101,7 +102,9 @@ Example `config/analyzer_config.json` format:
 {
   "input": "output/toto_results.csv",
   "output": "output/analyze_result.csv",
+  "suggestion_output": "output/suggestion_numbers.csv",
   "range_config": "config/range.json",
+  "recent_draw_count": 10,
   "mode": "least",
   "bottom_count": 10,
   "top_count": null,
@@ -115,7 +118,9 @@ Example `config/analyzer_config.json` format:
 | :--- | :--- | :--- | :--- |
 | `input` | String (Filepath, e.g. `"output/toto_results.csv"`) | Path to input CSV file containing draw records. | Defaults to `"output/toto_results.csv"`. |
 | `output` | String (Filepath, e.g. `"output/analyze_result.csv"`) | Path where analysis CSV results will be saved. | Defaults to `"output/analyze_result.csv"`. |
+| `suggestion_output` | String (Filepath, e.g. `"output/suggestion_numbers.csv"`) | Path where ranked analysis numbers absent from recent draws will be saved, in a one-column CSV. | Defaults to `"output/suggestion_numbers.csv"`. |
 | `range_config` | String (Filepath, e.g. `"config/range.json"`) | Path to numeric range bounds config JSON file. | Defaults to `"config/range.json"`. |
+| `recent_draw_count` | Positive Integer (e.g. `10`) | Number of latest draws, selected by draw date, used to exclude numbers from suggestions. | Defaults to `10`. |
 | `mode` | String (`"least"` or `"most"`) | Analysis ranking mode (`"least"` = least-appearing first, `"most"` = most-appearing first). | Defaults to `"least"`. |
 | `bottom_count` | Integer (e.g. `10`) | Minimum number of least-appearing ranked rows to output (includes cutoff ties). | Defaults to `10` when `mode` is `"least"`. |
 | `top_count` | Integer (e.g. `10`) | Minimum number of most-appearing ranked rows to output (includes cutoff ties). | Defaults to `10` when `mode` is `"most"`. |
