@@ -7,7 +7,7 @@ from typing import Sequence
 from .models import AnalysisRow, AnalysisSummary, DrawRecord, ParseSummary
 
 
-def _resolve_date_range(
+def resolve_date_range(
     records: Sequence[DrawRecord],
     window: str | None,
     custom_start: date | None,
@@ -59,7 +59,7 @@ def analyze_numbers(
     if min_value is not None and max_value is not None and min_value > max_value:
         raise ValueError("min_value cannot be greater than max_value")
 
-    start_date, end_date = _resolve_date_range(records, window, custom_start, custom_end)
+    start_date, end_date = resolve_date_range(records, window, custom_start, custom_end)
 
     filtered = [r for r in records if start_date <= r.draw_date <= end_date]
     observations = [n for record in filtered for n in record.numbers]

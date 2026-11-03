@@ -8,6 +8,7 @@ version = "0.1.0"
 description = "Analyze least-appearing lottery combinations by date and priority scopes"
 readme = "README.md"
 requires-python = ">=3.10"
+dependencies = ["numpy>=1.24,<3", "scipy>=1.10,<2", "matplotlib>=3.7,<4"]
 authors = [{ name = "Project Team" }]
 
 [tool.setuptools]

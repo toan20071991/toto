@@ -8,6 +8,7 @@ from pathlib import Path
 from .analyzer import analyze_numbers, suggest_numbers
 from .config import load_analyzer_config, load_range_config
 from .parser import parse_csv_file
+from .report import write_report
 
 
 def _parse_date_arg(value: str):
@@ -168,6 +169,14 @@ def main() -> None:
     )
     _write_suggestions(suggestion_output_path, suggestions)
     print(f"suggestion_rows={len(suggestions)}")
+    report_folder = Path(output_path).parent / "toto_patterns"
+    statistics = write_report(
+        records, report_folder, range_config.min_value, range_config.max_value,
+        window, start_date, end_date,
+    )
+    print(f"report_draws={statistics['draws']}")
+    print(f"report_excluded_rows={statistics['excluded_report_rows']}")
+    print(f"report_output={report_folder}")
 
 
 if __name__ == "__main__":

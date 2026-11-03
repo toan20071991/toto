@@ -75,6 +75,32 @@ Example `config/range.json` format:
 
 ## Run
 
+Use Python 3.10 or newer. Install the package and its NumPy/SciPy/Matplotlib dependencies
+once in an isolated environment (Windows PowerShell, from the project root):
+
+```powershell
+py -3.12 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e .
+.\.venv\Scripts\python.exe -m src.lotto_analyzer.cli
+```
+
+On Linux/macOS, use `python3 -m venv .venv`, then `.venv/bin/python -m pip install -e .`
+and `.venv/bin/python -m src.lotto_analyzer.cli`. No `PYTHONPATH` setting is required.
+Use the environment's Python for the commands below (or activate it first).
+
+Every analyzer run also refreshes `toto_patterns/` beside the ranking CSV (`output/toto_patterns/`
+by default): `frequency.png`, `timeline.png`, `clusters.png`, `draw_structure.png`,
+`statistics.json`, and `report.md`. Open `report.md` to view the charts.
+The report uses the same inclusive date window and configured numeric range as ranking.
+Main numbers (first six cells) and the additional number (seventh cell) are separate in reports;
+ranking and suggestions keep their existing seven-cell rules. Reports skip rows with repeated
+numbers and disclose the excluded count without changing ranking. Duplicate dates remain
+separate rows (ordered by numbers within a date). Empty histories refresh all artifacts with
+an unavailable explanation; single-draw overlap is JSON `null`. Constant columns use neutral
+correlation for clustering. Statistics use seed 20261103 and 5,000 simulations, so report
+generation adds computation time. These descriptive patterns are not predictions.
+The legacy standalone script is not required or invoked by the analyzer.
+
 Analyzer commands:
 
 1. **Short-Form (Default Config)**:
