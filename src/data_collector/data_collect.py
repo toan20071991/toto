@@ -4,6 +4,8 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 import argparse
 import json
+import subprocess
+import sys
 import time
 import re
 
@@ -210,6 +212,33 @@ def get_latest_existing_date(filename):
     return None
 
 
+def _is_missing_browser_error(exc):
+    """Return True when Playwright failed because the browser binary is missing."""
+    message = str(exc)
+    return (
+        "Executable doesn't exist" in message
+        or "Please run the following command to download new browsers" in message
+    )
+
+
+def _launch_chromium(playwright):
+    """Launch headless Chromium, installing the browser binary once if missing."""
+    try:
+        return playwright.chromium.launch(headless=True)
+    except Exception as exc:
+        if not _is_missing_browser_error(exc):
+            raise
+        print(
+            "Chromium browser executable not found. Installing Playwright Chromium...",
+            flush=True,
+        )
+        subprocess.run(
+            [sys.executable, "-m", "playwright", "install", "chromium"],
+            check=True,
+        )
+        return playwright.chromium.launch(headless=True)
+
+
 def main(append=None):
     if append is None:
         append = config.get("append", True)
@@ -226,7 +255,7 @@ def main(append=None):
         print(f"No existing data found. Defaulting collection boundary to 1 year ago ({limit_date.strftime('%Y-%m-%d')})...", flush=True)
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
+        browser = _launch_chromium(p)
         page = browser.new_page(
             user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         )

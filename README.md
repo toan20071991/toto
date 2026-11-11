@@ -81,11 +81,13 @@ once in an isolated environment (Windows PowerShell, from the project root):
 ```powershell
 py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -e .
+.\.venv\Scripts\playwright.exe install chromium
 .\.venv\Scripts\python.exe -m src.lotto_analyzer.cli
 ```
 
-On Linux/macOS, use `python3 -m venv .venv`, then `.venv/bin/python -m pip install -e .`
-and `.venv/bin/python -m src.lotto_analyzer.cli`. No `PYTHONPATH` setting is required.
+On Linux/macOS, use `python3 -m venv .venv`, then `.venv/bin/python -m pip install -e .`,
+`.venv/bin/playwright install chromium` (if you will run the data collector), and
+`.venv/bin/python -m src.lotto_analyzer.cli`. No `PYTHONPATH` setting is required.
 Use the environment's Python for the commands below (or activate it first).
 
 Every analyzer run also refreshes `toto_patterns/` beside the ranking CSV (`output/toto_patterns/`
@@ -189,6 +191,8 @@ python testSample/createCSVtest.py --from-date 2025-07-20 --to-date 2026-07-19 -
 
 ## Collect webpage data
 
+The collector requires Playwright's Chromium browser binary (if not installed beforehand via
+`playwright install chromium`, it installs Chromium automatically on first run).
 Run the collector directly from the root directory with JSON config:
 
 python src/data_collector/data_collect.py
